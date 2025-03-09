@@ -5,6 +5,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>Holecy.Coursera.Microsoft.Library;</RootNamespace>
   </PropertyGroup>
 
 </Project>
