@@ -1,4 +1,4 @@
-namespace Holecy.Coursera.Microsoft.Library;
+namespace Holecy.Coursera.Microsoft.LibraryManagement;
 
 public interface IReader
 {

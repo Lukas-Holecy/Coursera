@@ -1,8 +1,7 @@
+namespace Holecy.Coursera.Microsoft.LibraryManagement;
 
 using System.ComponentModel;
 using System.Reflection.Metadata;
-
-namespace Holecy.Coursera.Microsoft.Library;
 
 public class Menu(IReader reader)
 {
@@ -20,10 +19,15 @@ public class Menu(IReader reader)
 
     public static void ShowHint()
     {
-        Console.WriteLine("1 - Borrow a book");
-        Console.WriteLine("2 - Return a book");
-        Console.WriteLine("3 - List borrowed books");
-        Console.WriteLine("4 - Show menu again");
+        Console.WriteLine("Choose a command using a number:");
+        Console.WriteLine("1 - Add a book");
+        Console.WriteLine("2 - Remove a book");
+        Console.WriteLine("3 - List all books");
+        Console.WriteLine("4 - Set current reader");
+        Console.WriteLine("5 - Borrow a book");
+        Console.WriteLine("6 - Return a book");
+        Console.WriteLine("7 - List borrowed books");
+        Console.WriteLine("8 - Show menu again");
         Console.WriteLine("0 - Exit");
     }
 
@@ -52,6 +56,7 @@ public class Menu(IReader reader)
                     break;
                 default:
                     Console.WriteLine("Unknown command");
+                    this.
                     break;
             }
         }
