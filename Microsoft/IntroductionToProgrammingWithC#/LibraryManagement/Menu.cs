@@ -3,11 +3,11 @@ namespace Holecy.Coursera.Microsoft.LibraryManagement;
 using System.ComponentModel;
 using System.Reflection.Metadata;
 
-public class Menu(IReader reader)
+public class Menu(Library library)
 {
     private bool running = false;
-
-    private IReader reader = reader;
+    private Reader currentReader;
+    private Library library = library;
 
     public void Run()
     {
@@ -37,21 +37,43 @@ public class Menu(IReader reader)
         {
             Console.WriteLine("Enter the number of the command:");
             string input = Console.ReadLine() ?? string.Empty;
-            switch (input)
+            switch (input.ToUpper())
             {
                 case "0":
+                case "EXIT":
                     running = false;
                     break;
                 case "1":
-                    this.BorrowBook();
+                case "ADD":
+                    this.AddBook();
                     break;
                 case "2":
-                    this.ReturnBook();
+                case "REMOVE":
+                    this.RemoveBook();
                     break;
                 case "3":
-                    this.ListBorrowedBooks();
+                case "LIST":
+                    this.ListAllBooks();
                     break;
                 case "4":
+                case "LOGIN":
+                    SetCurrentReader();
+                    break;
+                case "5":
+                case "BORROW":
+                    this.BorrowBook();
+                    break;
+                case "6":
+                case "RETURN":
+                    this.ReturnBook();
+                    break;
+                case "7":
+                case "LIST BORROWED":
+                    this.ListBorrowedBooks();
+                    break;
+                case "8":
+                case "HELP":
+                case "HINT":
                     ShowHint();
                     break;
                 default:
@@ -62,17 +84,87 @@ public class Menu(IReader reader)
         }
     }
 
+    private void AddBook()
+    {
+        Console.WriteLine("Enter the name of the book to add:");
+        var bookName = Console.ReadLine();
+        if (string.IsNullOrEmpty(bookName))
+        {
+            Console.WriteLine("The book name must be specified.");
+            return;
+        }
+
+        library.AddBook(bookName);
+    }
+
+    private void RemoveBook()
+    {
+        Console.WriteLine("Enter the name of the book to remove:");
+        var bookName = Console.ReadLine();
+        if (string.IsNullOrEmpty(bookName))
+        {
+            Console.WriteLine("The book name must be specified.");
+            return;
+        }
+
+        library.RemoveBook(bookName);
+    }
+
+    private void ListAllBooks()
+    {
+        Console.WriteLine("Available books:");
+        var i = 1;
+        foreach (var book in library.Books)
+        {
+            Console.WriteLine($"{i}\t-\t{book});
+            i++;
+        }
+    }
+
+    private void SetCurrentReader()
+    {
+        Console.WriteLine("Enter the name of the reader:");
+        var readerName = Console.ReadLine();
+        if (string.IsNullOrEmpty(readerName))
+        {
+            Console.WriteLine("The reader name must be specified.");
+            return;
+        }
+
+        currentReader = library.GetReader(readerName);
+        if (currentReader is null)
+        {
+            currentReader = library.AddReader(readerName);
+            Console.WriteLine($"The reader {readerName} has been added.");
+
+            return;
+        }
+
+        Console.WriteLine($"The reader {readerName} has been set as the current reader.");
+    }
+
     private void ListBorrowedBooks()
     {
-        Console.WriteLine("Borrowed books:");
-        for (int i = 0; i < reader.Books.Length; i++)
+        if (currentReader is null)
         {
-            Console.WriteLine($"{i + 1}. {reader.Books[i] ?? string.Empty}");
+            Console.WriteLine("The current reader is not set.");
+            return;
+        }
+        Console.WriteLine($"The reader {currentReade} has borrowed books:");
+        for (int i = 0; i < currentReader.Books.Length; i++)
+        {
+            Console.WriteLine($"{i + 1}. {currentReader.Books[i] ?? string.Empty}");
         }
     }
 
     private void ReturnBook()
     {
+        if (currentReader is null)
+        {
+            Console.WriteLine("The current reader is not set.");
+            return;
+        }
+
         Console.WriteLine("Enter the name of the book to return:");
         var bookName = Console.ReadLine();
         if (string.IsNullOrEmpty(bookName))
@@ -81,17 +173,7 @@ public class Menu(IReader reader)
             return;
         }
 
-        var index = Array.IndexOf(reader.Books, bookName);
-        if (index != -1)
-        {
-            reader.Books[index] = string.Empty;            
-            Console.WriteLine($"The book {bookName} has been returned.");
-            return;
-        }
-        else
-        {
-            Console.WriteLine($"The book {bookName} is not borrowed.");
-        }
+        library.ReturnBook(bookName, currentReader);
     }
 
     private void BorrowBook()
@@ -99,7 +181,7 @@ public class Menu(IReader reader)
         var emptyIndex = Array.IndexOf(reader.Books, string.Empty);
         if (emptyIndex == -1)
         {
-            Console.WriteLine("You have borrowed the maximum number of books.");
+            Console.WriteLine($"The reader {currentReader.Name} have borrowed the maximum number of books.");
             return;
         }
 
@@ -112,7 +194,6 @@ public class Menu(IReader reader)
             return;
         }
 
-        reader.Books[emptyIndex] = bookName;
-        Console.WriteLine($"The book {bookName} has been borrowed.");
+        library.BorrowBook(bookName, currentReader);
     }
 }
