@@ -3,12 +3,30 @@ namespace Holecy.Coursera.Microsoft.LibraryManagement;
 using System.ComponentModel;
 using System.Reflection.Metadata;
 
+/// <summary>
+/// Provides a command-line interface for interacting with the library system.
+/// </summary>
+/// <param name="library">The library instance to work with</param>
 public class Menu(Library library)
 {
+    /// <summary>
+    /// Flag indicating if the menu is currently running.
+    /// </summary>
     private bool running = false;
-    private Reader currentReader;
+    
+    /// <summary>
+    /// The currently selected reader for operations.
+    /// </summary>
+    private IReader? currentReader;
+    
+    /// <summary>
+    /// Reference to the library system.
+    /// </summary>
     private Library library = library;
-
+    
+    /// <summary>
+    /// Starts the menu system and begins processing commands.
+    /// </summary>
     public void Run()
     {
         running = true;
@@ -16,7 +34,9 @@ public class Menu(Library library)
         this.Process();
     }
 
-
+    /// <summary>
+    /// Displays the available commands to the user.
+    /// </summary>
     public static void ShowHint()
     {
         Console.WriteLine("Choose a command using a number:");
@@ -31,6 +51,9 @@ public class Menu(Library library)
         Console.WriteLine("0 - Exit");
     }
 
+    /// <summary>
+    /// Processes user input and executes appropriate commands.
+    /// </summary>
     public void Process()
     {
         while (running)
@@ -77,13 +100,16 @@ public class Menu(Library library)
                     ShowHint();
                     break;
                 default:
-                    Console.WriteLine("Unknown command");
-                    this.
+                    Console.WriteLine("Unknown command");                    
+                    ShowHint();
                     break;
             }
         }
     }
 
+    /// <summary>
+    /// Handles adding a new book to the library.
+    /// </summary>
     private void AddBook()
     {
         Console.WriteLine("Enter the name of the book to add:");
@@ -97,6 +123,9 @@ public class Menu(Library library)
         library.AddBook(bookName);
     }
 
+    /// <summary>
+    /// Handles removing a book from the library.
+    /// </summary>
     private void RemoveBook()
     {
         Console.WriteLine("Enter the name of the book to remove:");
@@ -110,17 +139,23 @@ public class Menu(Library library)
         library.RemoveBook(bookName);
     }
 
+    /// <summary>
+    /// Displays all books in the library.
+    /// </summary>
     private void ListAllBooks()
     {
         Console.WriteLine("Available books:");
         var i = 1;
-        foreach (var book in library.Books)
+        foreach (var book in library.AvailableBooks)
         {
-            Console.WriteLine($"{i}\t-\t{book});
+            Console.WriteLine($"{i}\t-\t{book}");
             i++;
         }
     }
 
+    /// <summary>
+    /// Sets or creates the current reader for operations.
+    /// </summary>
     private void SetCurrentReader()
     {
         Console.WriteLine("Enter the name of the reader:");
@@ -143,6 +178,9 @@ public class Menu(Library library)
         Console.WriteLine($"The reader {readerName} has been set as the current reader.");
     }
 
+    /// <summary>
+    /// Displays books borrowed by the current reader.
+    /// </summary>
     private void ListBorrowedBooks()
     {
         if (currentReader is null)
@@ -150,13 +188,16 @@ public class Menu(Library library)
             Console.WriteLine("The current reader is not set.");
             return;
         }
-        Console.WriteLine($"The reader {currentReade} has borrowed books:");
+        Console.WriteLine($"The reader {currentReader.Name} has borrowed books:");
         for (int i = 0; i < currentReader.Books.Length; i++)
         {
             Console.WriteLine($"{i + 1}. {currentReader.Books[i] ?? string.Empty}");
         }
     }
 
+    /// <summary>
+    /// Handles returning a book to the library.
+    /// </summary>
     private void ReturnBook()
     {
         if (currentReader is null)
@@ -176,9 +217,18 @@ public class Menu(Library library)
         library.ReturnBook(bookName, currentReader);
     }
 
+    /// <summary>
+    /// Handles borrowing a book from the library.
+    /// </summary>
     private void BorrowBook()
     {
-        var emptyIndex = Array.IndexOf(reader.Books, string.Empty);
+        if (currentReader is null)
+        {
+            Console.WriteLine("The current reader is not set.");
+            return;
+        }
+
+        var emptyIndex = Array.IndexOf(currentReader.Books, string.Empty);
         if (emptyIndex == -1)
         {
             Console.WriteLine($"The reader {currentReader.Name} have borrowed the maximum number of books.");
